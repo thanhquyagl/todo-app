@@ -1,10 +1,4 @@
-import { useState } from "react";
-
-const MainButton = ({ active = "", children }) => {
-  return (
-    <button type="button" className={"px-4 py-1 rounded-md " + active}> {children}</button >
-  )
-}
+import { useState, useEffect } from "react";
 
 let nextId = 0
 
@@ -16,16 +10,16 @@ export default function App() {
 
   const [editingId, setEditingId] = useState(null);
 
-  function handleTodoChange(e) {
+  const handleTodoChange = (e) => {
     setTodo(e.target.value)
   }
 
-  function handleListsChange() {
+  const handleListsChange = () => {
     if (event.key === 'Enter') {
       if (todo != '') {
         setLists([
           ...lists,
-          { id: nextId++, todo: todo }
+          { id: nextId++, text: todo, completed: false }
         ])
         setTodo('')
       }
@@ -42,14 +36,71 @@ export default function App() {
 
   const handleItemChange = (e, id) => {
     const updatedLists = lists.map(item =>
-      item.id === id ? { ...item, todo: e.target.value } : item
+      item.id === id ? { ...item, text: e.target.value } : item
     );
     setLists(updatedLists);
-
-    if (e.keyCode === 13 || event.keyCode === 13 || e.key === 'Enter') {
-      console.log(e.keyCode);
-    }
   };
+
+  const handleTodoDone = (e, id) => {
+    const updatedLists = lists.map(item =>
+      item.id === id ? { ...item, completed: e.target.checked } : item
+    );
+    setLists(updatedLists);
+  }
+
+  const [showLists, setShowLists] = useState(0);
+  const [activeTodos, setActiveTodos] = useState([])
+  const [completedTodos, setCompletedTodos] = useState([])
+  const [visibleTodos, setVisibleTodos] = useState([])
+  const [selectId, setSeclectId] = useState(0)
+
+  useEffect(() => {
+    setActiveTodos(lists.filter(items => !items.completed))
+  }, [lists]);
+
+  useEffect(() => {
+    setCompletedTodos(lists.filter(items => items.completed))
+  }, [lists]);
+
+  useEffect(() => {
+    setVisibleTodos(showLists == 1 ? activeTodos : (showLists == 2 ? completedTodos : lists));
+  }, [showLists, lists, activeTodos, completedTodos]);
+  console.log(activeTodos);
+  console.log(completedTodos);
+
+  const handleCheckButton = (id) => {
+    setShowLists(id)
+  }
+
+  const listButtons = [
+    {
+      id: 0,
+      text: "all",
+    },
+    {
+      id: 1,
+      text: "active",
+    },
+    {
+      id: 2,
+      text: "completed",
+    },
+  ]
+
+  const ButtonLists = () => {
+    return (
+      <div className="flex gap-1">
+        {
+          listButtons.map(item =>
+            <button key={item.id} type="button" onClick={() => {
+              handleCheckButton(item.id)
+              setSeclectId(item.id)
+            }} className={"px-4 py-1 rounded-md " + (item.id == selectId && "border")}> {item.text}</button >
+          )
+        }
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-slate-300 flex flex-col pt-20 items-center gap-5">
@@ -60,14 +111,19 @@ export default function App() {
         </div>
 
         {
-          lists.map((item) => (
+          visibleTodos.map((item) => (
             <div className="group border-b py-3 px-2 mb-1 relative" key={item.id}>
               <div className="peer flex gap-2 items-center">
-                <input className="peer size-3.5 appearance-none rounded-sm border border-slate-300 flex-none accent-pink-500 checked:appearance-auto" type="checkbox" name="1" />
+                <input
+                  type="checkbox"
+                  checked={item.completed}
+                  onChange={(e) => handleTodoDone(e, item.id)}
+                  className="peer size-3.5 appearance-none rounded-sm border border-slate-300 flex-none accent-pink-500 checked:appearance-auto"
+                />
                 {editingId === item.id ? (
                   <input
                     type="text"
-                    value={item.todo}
+                    value={item.text}
                     onChange={(e) => handleItemChange(e, item.id)}
                     onBlur={handleBlur}
                     onKeyDown={(e) => e.key === "Enter" && handleBlur(false)}
@@ -76,10 +132,10 @@ export default function App() {
                   />
                 ) : (
                   <span
-                    className="peer-checked:text-slate-400 pr-4 peer-checked:line-through"
+                    className="peer-checked:text-slate-400 w-full pr-4 peer-checked:line-through"
                     onDoubleClick={() => handleDoubleClick(item.id)}
                   >
-                    {item.todo}
+                    {item.text}
                   </span>
                 )}
               </div>
@@ -96,13 +152,9 @@ export default function App() {
           <div>
             <span>{lists.length} item(s) left</span>
           </div>
-          <div className="flex gap-1">
-            <MainButton active="border">all</MainButton>
-            <MainButton>active</MainButton>
-            <MainButton>completed</MainButton>
-          </div>
+          <ButtonLists />
           <div>
-            <MainButton>Clear Completed</MainButton>
+            <button type="button" onClick={handleCheckButton} className="px-4 py-1 rounded-md">Clear Completed</button >
           </div>
         </div>
 
