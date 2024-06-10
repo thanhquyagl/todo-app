@@ -65,8 +65,6 @@ export default function App() {
   useEffect(() => {
     setVisibleTodos(showLists == 1 ? activeTodos : (showLists == 2 ? completedTodos : lists));
   }, [showLists, lists, activeTodos, completedTodos]);
-  console.log(activeTodos);
-  console.log(completedTodos);
 
   const handleCheckButton = (id) => {
     setShowLists(id)
@@ -103,9 +101,9 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-300 flex flex-col pt-20 items-center gap-5">
+    <div className="min-h-screen bg-slate-300 flex flex-col pt-20 px-3 items-center gap-5 box-">
       <h1 className="text-5xl font-bold">📓 Todo List</h1>
-      <div className="flex flex-col bg-white w-[600px] min-h-[432px] rounded py-4 px-5 shadow-md">
+      <div className="flex flex-col bg-white max-w-[600px] w-full min-h-[432px] rounded py-4 px-5 shadow-md">
         <div className="flex">
           <input type="text" onChange={handleTodoChange} onKeyDown={handleListsChange} value={todo} className='border-b w-full p-2 mb-1 focus:outline-none' placeholder='Viết todo của bạn ở đây....' />
         </div>
@@ -148,18 +146,21 @@ export default function App() {
           ))
         }
 
-        <div className="flex justify-between items-center text-sm text-gray-800 mt-auto">
+        <div className="flex justify-between items-center flex-wrap gap-2 text-sm text-gray-800 mt-auto">
           <div>
-            <span>{lists.length} item(s) left</span>
+            <span>{activeTodos.length} item(s) left</span>
           </div>
           <ButtonLists />
           <div>
-            <button type="button" onClick={handleCheckButton} className="px-4 py-1 rounded-md">Clear Completed</button >
+            <button type="button" onClick={() => { setLists(lists.filter(items => !items.completed)) }} className="px-4 py-1 rounded-md">Clear Completed</button >
           </div>
         </div>
 
       </div>
-      <p className="text-center text-sm text-gray-500 font-mono">© AGL</p>
+      <div className="text-center text-sm text-gray-500 font-mono tracking-[-0.08em]">
+        <p>Nhấp đúp chuột vào việc cần làm để chỉnh sửa</p>
+        <p>© AGL</p>
+      </div>
     </div>
   )
 }
