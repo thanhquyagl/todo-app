@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"
 
 let nextId = 0
 
@@ -6,29 +6,21 @@ export default function App() {
 
   const [lists, setLists] = useState([])
 
-  const [todo, setTodo] = useState('')
+  const [text, setText] = useState('')
 
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] = useState(null)
 
-  const handleTodoChange = (e) => {
-    setTodo(e.target.value)
-  }
-
-  const handleListsChange = () => {
+  const handleAddTodo = () => {
     if (event.key === 'Enter') {
-      if (todo != '') {
+      if (text != '') {
         setLists([
           ...lists,
-          { id: nextId++, text: todo, completed: false }
+          { id: nextId++, text: text, completed: false }
         ])
-        setTodo('')
+        setText('')
       }
     }
   }
-
-  const handleDoubleClick = (id) => {
-    setEditingId(id);
-  };
 
   const handleBlur = () => {
     setEditingId(null);
@@ -105,7 +97,7 @@ export default function App() {
       <h1 className="text-5xl font-bold">📓 Todo List</h1>
       <div className="flex flex-col bg-white max-w-[600px] w-full min-h-[432px] rounded py-4 px-5 shadow-md">
         <div className="flex">
-          <input type="text" onChange={handleTodoChange} onKeyDown={handleListsChange} value={todo} className='border-b w-full p-2 mb-1 focus:outline-none' placeholder='Viết todo của bạn ở đây....' />
+          <input type="text" onChange={e => setText(e.target.value)} onKeyDown={handleAddTodo} value={text} className='border-b w-full p-2 mb-1 focus:outline-none' placeholder='Viết todo của bạn ở đây....' />
         </div>
 
         {
@@ -131,13 +123,13 @@ export default function App() {
                 ) : (
                   <span
                     className="peer-checked:text-slate-400 w-full pr-4 peer-checked:line-through"
-                    onDoubleClick={() => handleDoubleClick(item.id)}
+                    onDoubleClick={() => setEditingId(item.id)}
                   >
                     {item.text}
                   </span>
                 )}
               </div>
-              <button className="group-hover:opacity-100 opacity-0 transition-all absolute top-1/2 right-0 -translate-y-1/2 text-red-600 p-2" onClick={() => { setLists(lists.filter(a => a.id !== item.id)) }}>
+              <button className="group-hover:opacity-100 opacity-0 transition-all absolute top-1/2 right-0 -translate-y-1/2 text-red-600 p-2" onClick={() => setLists(lists.filter(a => a.id !== item.id))}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
